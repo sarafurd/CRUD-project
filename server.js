@@ -15,7 +15,7 @@ const anime = {
             "Shippo": "Yoki-fox"
         }
     },
-    "rruit basket": {
+    "fruit basket": {
         "mainChars": {
             "Shigure Soma": "Dog Spirit",
             "Tohru Honda": "main character",
