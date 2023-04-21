@@ -32,6 +32,18 @@ const anime = {
             "Minako Aino": "Sailor Venus",
             "Mamoru Chiba": "Tuxedo Mask"
         }
+    },
+    "fairy tail": {
+        "mainChars": {
+            "Gray Fullbuster": "Ice Mage",
+            "Lucy Heartfilia": "Celestial Spirit Mage",
+            "Natsu Dragneel": "Dragon Slayer",
+            "Happy": "Funny Blue Cat",
+            "Ezra Scarlet": "Requip Magic",
+            "Charles": "Boring white Cat",
+            "Wendy Marvell": "Wind Demon Slayer"
+
+        }
 
     }
 
