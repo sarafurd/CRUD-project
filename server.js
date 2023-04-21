@@ -5,26 +5,34 @@ const PORT = 8000
 
 app.use(cors())
 
-const animeWatch = {
-    "one piece": {
-        "currEpisode": 1032,
-        "totalEpisodes": 1059,
-        "studios": "Toei Production",
+const anime = {
+    "inuyasha": {
+        "mainChars": {
+            "Inuyasha": "Half-Dog Yokai",
+            "Kagome": "Girl from another world",
+            "Sango": "Demon Slayer",
+            "Miroku": "Monk",
+            "Shippo": "Yoki-fox"
+        }
     },
-    "urusei yatsura (2022)": {
-        "currEpisode": 19,
-        "totalEpisodes": 23,
-        "studios": "David Production"
+    "rruit basket": {
+        "mainChars": {
+            "Shigure Soma": "Dog Spirit",
+            "Tohru Honda": "main character",
+            "Yuki Soma": "Rat Spirit",
+            "Kyo Soma": "Cat Spirit"
+        }
     },
-    "the ice guy and his cool female colleague": {
-        "currEpisode": 3,
-        "totalEpisodes": 12,
-        "studios": "Zero-G, Liber"
-    },
-    "endo and kobayashi live! the latest on tsundere villainess lieselotte": {
-        "currEpisode": 7,
-        "totalEpisode": 12,
-        "studios": "Tezuka Productions"
+    "sailor moon": {
+        "mainChars": {
+            "Usagi Tsukino": "Sailor Moon",
+            "Ami Mizuno": "Sailor Mercury",
+            "Rei Hino": "Sailor Mars",
+            "Makoto Kino": "Sailor Jupiter",
+            "Minako Aino": "Sailor Venus",
+            "Mamoru Chiba": "Tuxedo Mask"
+        }
+
     }
 
 }
@@ -35,10 +43,10 @@ app.get('/', (request, response) => {
 
 app.get('/api/:animeName', (request, response) => {
     const animesName = request.params.animeName.toLowerCase()
-    if (animeWatch[animesName]) {
-        response.json(animeWatch[animesName])
+    if (anime[animesName]) {
+        response.json(anime[animesName])
     } else {
-        response.json(animeWatch['endo and kobayashi live! the latest on tsundere villainess lieselotte'])
+        response.json(anime['fruit basket'])
     }
 })
 
