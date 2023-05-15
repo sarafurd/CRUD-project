@@ -1,67 +1,92 @@
-const express = require('express')
-const app = express()
-const cors = require('cors')
-const PORT = 8000
+const express = require('express');
+const app = express();
+const MongoClient = require('mongodb').MongoClient;
+const { ObjectId } = require('mongodb');
+const PORT = 4000;
+require('dotenv').config();
 
-app.use(cors())
+let db;
+const dbConnectionStr = process.env.DB_STRING;
+const dbName = 'anime';
 
-const anime = {
-    "inuyasha": {
-        "mainChars": {
-            "Inuyasha": "Half-Dog Yokai",
-            "Kagome": "Girl from another world",
-            "Sango": "Demon Slayer",
-            "Miroku": "Monk",
-            "Shippo": "Yoki-fox"
-        }
-    },
-    "fruit basket": {
-        "mainChars": {
-            "Shigure Soma": "Dog Spirit",
-            "Tohru Honda": "main character",
-            "Yuki Soma": "Rat Spirit",
-            "Kyo Soma": "Cat Spirit"
-        }
-    },
-    "sailor moon": {
-        "mainChars": {
-            "Usagi Tsukino": "Sailor Moon",
-            "Ami Mizuno": "Sailor Mercury",
-            "Rei Hino": "Sailor Mars",
-            "Makoto Kino": "Sailor Jupiter",
-            "Minako Aino": "Sailor Venus",
-            "Mamoru Chiba": "Tuxedo Mask"
-        }
-    },
-    "fairy tail": {
-        "mainChars": {
-            "Gray Fullbuster": "Ice Mage",
-            "Lucy Heartfilia": "Celestial Spirit Mage",
-            "Natsu Dragneel": "Dragon Slayer",
-            "Happy": "Funny Blue Cat",
-            "Ezra Scarlet": "Requip Magic",
-            "Charles": "Boring white Cat",
-            "Wendy Marvell": "Wind Demon Slayer"
+const connectToDb = async() => {
+    const client = await MongoClient.connect(dbConnectionStr, { useUnifiedTopology: true });
+    console.log(`Connected to ${dbName} Database`);
+    db = client.db(dbName);
+};
 
-        }
+connectToDb().then(() => {
+    app.listen(process.env.PORT || PORT, () => {
+        console.log(`The server is running on port ${PORT}! You better go catch it!`);
+    });
+}).catch((error) => {
+    console.error('Error connecting to database:', error);
+});
 
-    }
-
-}
+app.set('view engine', 'ejs');
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.get('/', (request, response) => {
-    response.sendFile(__dirname + '/index.html')
-})
+    db.collection('animes')
+        .find()
+        .sort({ likes: -1 })
+        .toArray()
+        .then(data => {
+            response.render('index.ejs', { info: data });
+        })
+        .catch(error => console.error(error));
+});
 
-app.get('/api/:animeName', (request, response) => {
-    const animesName = request.params.animeName.toLowerCase()
-    if (anime[animesName]) {
-        response.json(anime[animesName])
-    } else {
-        response.json(anime['fruit basket'])
+app.post('/addAnime', (request, response) => {
+    const anime = {
+        animeName: request.body.animeName,
+        desc: request.body.desc,
+        id: request.body.id
+    };
+
+    db.collection('animes')
+        .insertOne(anime)
+        .then(result => {
+            console.log('Anime Added');
+            response.redirect('/');
+        })
+        .catch(error => console.error(error));
+});
+
+app.delete('/deleteAnime/:animeName', (req, res) => {
+    const animeName = req.params.animeName;
+    if (!animeName) {
+        return res.status(400).json({ error: 'Missing animeName parameter' });
     }
-})
 
-app.listen(process.env.PORT || PORT, () => {
-    console.log(`The server is running on port ${PORT}! You better go catch it!`)
-})
+    db.collection('animes')
+        .deleteOne({ animeName: animeName })
+        .then(result => {
+            console.log('Anime Deleted');
+            res.json({ message: 'Anime deleted successfully' });
+        })
+        .catch(error => console.error(error));
+});
+
+app.put('/updateAnime/:animeId', (req, res) => {
+    const animeId = req.params.animeId;
+    const newAnimeName = req.body.animeName;
+    const newDesc = req.body.desc;
+
+    // Convert the animeId string to an ObjectId
+    const objectId = new ObjectId(animeId);
+
+    // Perform the update operation based on the converted objectId
+    db.collection('animes')
+        .updateOne({ _id: objectId }, { $set: { animeName: newAnimeName, desc: newDesc } })
+        .then(result => {
+            console.log('Anime Updated');
+            res.json({ success: true, message: 'Anime updated successfully' });
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json({ success: false, message: 'Failed to update anime' });
+        });
+});

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Watchlist</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div id="header">
+        <div class="container">
+
+        </div>
+        <div class="header-text">
+            <h1>Anime Watchlist</h1>
+            <p>A website that stores information on the anime people love to watch</p>
+        </div>
+    </div>
+    <div id="addanime">
+        <div class="form-container">
+            <h2>Add an Anime:</h2>
+            <form action="/addAnime" method="POST">
+                <input type="text" placeholder="Anime Name" name="animeName">
+                <textarea type="text" placeholder="Description" name="desc"></textarea>
+                <input type="submit" class="btn btn2">
+            </form>
+        </div>
+    </div>
+
+    <% if (info.length > 0) { %>
+        <div id="watchlist">
+            <table class="anime-table">
+                <thead>
+                    <tr>
+                        <th>Anime Name</th>
+                        <th>Description</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for (let i = 0; i < info.length; i++) { %>
+                        <tr id="<%= info[i]._id %>">
+                            <td>
+                                <%= info[i].animeName %>
+                            </td>
+                            <td>
+                                <%= info[i].desc %>
+                            </td>
+                            <td>
+                                <i class="fas fa-pencil" onclick="editAnime('<%= info[i]._id %>')"></i>
+                            </td>
+                            <td>
+                                <i class="fas fa-trash"></i>
+                            </td>
+                        </tr>
+                        <% } %>
+                </tbody>
+            </table>
+        </div>
+        <% } else { %>
+            <p>No anime added yet.</p>
+            <% } %> -->
+
+                <script src="js/main.js"></script>
+</body>
+
+</html>
