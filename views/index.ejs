@@ -47,7 +47,7 @@
                                 <%= info[i].desc %>
                             </td>
                             <td>
-                                <i class="fas fa-pencil" onclick="editAnime('<%= info[i]._id %>')"></i>
+                                <i class="fas fa-pencil" onclick="handleEditAnime(event, '<%= info[i]._id %>')"></i>
                             </td>
                             <td>
                                 <i class="fas fa-trash"></i>
@@ -59,7 +59,7 @@
         </div>
         <% } else { %>
             <p>No anime added yet.</p>
-            <% } %> -->
+            <% } %>
 
                 <script src="js/main.js"></script>
 </body>

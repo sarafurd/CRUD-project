@@ -75,8 +75,14 @@ app.put('/updateAnime/:animeId', (req, res) => {
     const newAnimeName = req.body.animeName;
     const newDesc = req.body.desc;
 
+    console.log('animeId:', animeId);
+    console.log('newAnimeName:', newAnimeName);
+    console.log('newDesc:', newDesc);
+
     // Convert the animeId string to an ObjectId
     const objectId = new ObjectId(animeId);
+
+    console.log('objectId:', objectId);
 
     // Perform the update operation based on the converted objectId
     db.collection('animes')

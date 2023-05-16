@@ -1,4 +1,3 @@
-const table = document.querySelector('table');
 document.addEventListener('DOMContentLoaded', () => {
     const addAnimeForm = document.querySelector('#addanime form');
     const submitButton = addAnimeForm.querySelector('input[type="submit"]');
@@ -22,33 +21,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
-    table.addEventListener('click', (event) => {
-        const deleteButton = event.target.closest('.fa-trash');
-        if (deleteButton) {
-            deleteAnime(event);
-        } else {
-            const editButton = event.target.closest('.fa-pencil');
-            if (editButton) {
-                editAnime(event);
+    const table = document.querySelector('table');
+    if (table) {
+        table.addEventListener('click', (event) => {
+            const deleteButton = event.target.closest('.fa-trash');
+            if (deleteButton) {
+                deleteAnime(event);
+            } else {
+                const editButton = event.target.closest('.fa-pencil');
+                if (editButton) {
+                    handleEditAnime(event);
+                }
             }
-        }
-    });
+        });
+    }
 
-    // Attach delete listeners to delete buttons
     attachDeleteListeners();
-
-    // Update table visibility
-    updateTableVisibility();
-
 });
-
-function attachDeleteListeners() {
-    const deleteButtons = document.querySelectorAll('.fa-trash');
-    deleteButtons.forEach((button) => {
-        button.addEventListener('click', deleteAnime);
-    });
-}
 
 async function deleteAnime(event) {
     const deleteButton = event.target;
@@ -70,92 +59,86 @@ async function deleteAnime(event) {
     } catch (err) {
         console.log(err);
     }
+
+    // Update table visibility
+    updateTableVisibility();
 }
 
 function updateTableVisibility() {
-    const rows = table.querySelectorAll('tbody tr');
-    if (rows.length === 0) {
-        table.style.display = 'none';
+    const table = document.querySelector('table');
+    if (table && table.querySelector('tbody').children.length > 0) {
+        table.style.display = 'block';
     } else {
-        table.style.display = 'table';
+        table.style.display = 'none';
     }
 }
 
-
-// Reattach event listeners after page refresh
-if (performance.navigation.type === 1) {
-    attachDeleteListeners();
+function attachDeleteListeners() {
+    const deleteButtons = document.querySelectorAll('.fa-trash');
+    deleteButtons.forEach((button) => {
+        button.addEventListener('click', deleteAnime);
+    });
 }
 
-function findParentRow(element) {
-    let currentElement = element;
-    while (currentElement && currentElement.nodeName !== 'TR') {
-        currentElement = currentElement.parentNode;
-    }
-    return currentElement;
-}
-
-function editAnime(animeId) {
-    const row = document.getElementById(animeId);
+async function handleEditAnime(event) {
+    const row = findParentRow(event.target);
     if (!row) {
         console.log('Unable to find parent row');
         return;
     }
 
-    const animeNameCell = row.querySelector('td:nth-child(1)');
-    const descCell = row.querySelector('td:nth-child(2)');
-
-    if (!animeNameCell || !descCell) {
-        console.log('Unable to retrieve the necessary data');
+    const editButton = event.target.closest('.fa-pencil');
+    if (!editButton) {
+        console.log('Unable to find edit button');
         return;
     }
 
-    const animeName = animeNameCell.textContent.trim();
-    const desc = descCell.textContent.trim();
+    editButton.removeEventListener('click', handleEditAnime); // Remove event listener temporarily
 
-    const newAnimeName = prompt('Enter the edited anime name:', animeName);
-    const newDesc = prompt('Enter the edited description:', desc);
-
-    if (newAnimeName !== null && newDesc !== null) {
-        updateAnime(animeId, newAnimeName, newDesc);
-    }
-}
-
-function findParentRow(element) {
-    let parent = element.parentElement;
-    while (parent) {
-        if (parent.tagName === 'TR') {
-            return parent;
-        }
-        parent = parent.parentElement;
-    }
-    return null;
-}
-
-function updateAnime(animeId, newAnimeName, newDesc) {
-    const row = document.getElementById(animeId);
+    const animeId = row.id;
     const animeNameCell = row.cells[0];
     const descCell = row.cells[1];
 
-    // Update the data in the code immediately
-    animeNameCell.innerText = newAnimeName;
-    descCell.innerText = newDesc;
+    const currentAnimeName = animeNameCell.textContent;
+    const currentDesc = descCell.textContent;
 
-    // Perform an AJAX request to update the anime data on the server
-    fetch(`/updateAnime/${encodeURIComponent(animeId)}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ animeName: newAnimeName, desc: newDesc })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
+    const newAnimeName = prompt('Enter the new anime name:', currentAnimeName);
+    const newDesc = prompt('Enter the new description:', currentDesc);
 
-            if (data.success === true) {
+    if (newAnimeName !== null && newDesc !== null) {
+        const data = {
+            animeName: newAnimeName,
+            desc: newDesc
+        };
+
+        try {
+            const response = await fetch(`/updateAnime/${encodeURIComponent(animeId)}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.status === 200) {
+                animeNameCell.textContent = newAnimeName;
+                descCell.textContent = newDesc;
                 console.log('Anime updated successfully');
             } else {
                 console.log('Failed to update anime');
             }
-        })
-        .catch(err => console.log(err));
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    editButton.addEventListener('click', handleEditAnime); // Add event listener back
+}
+
+function findParentRow(element) {
+    while (element) {
+        if (element.tagName === 'TR') {
+            return element;
+        }
+        element = element.parentNode;
+    }
+    return null;
 }
