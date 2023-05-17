@@ -21,33 +21,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    const table = document.querySelector('table');
+    const table = document.querySelector('.anime-table');
     if (table) {
         table.addEventListener('click', (event) => {
             const deleteButton = event.target.closest('.fa-trash');
+            const editButton = event.target.closest('.fa-pencil');
+
             if (deleteButton) {
-                deleteAnime(event);
-            } else {
-                const editButton = event.target.closest('.fa-pencil');
-                if (editButton) {
-                    handleEditAnime(event);
-                }
+                deleteAnime(deleteButton);
+            } else if (editButton) {
+                handleEditAnime(editButton);
             }
         });
     }
-
-    attachDeleteListeners();
 });
 
-async function deleteAnime(event) {
-    const deleteButton = event.target;
+async function deleteAnime(deleteButton) {
     const row = deleteButton.closest('tr');
-    const animeName = row.cells[0].innerText;
+    const animeId = row.id;
 
     try {
-        const response = await fetch(`/deleteAnime/${encodeURIComponent(animeName)}`, {
+        const response = await fetch(`/deleteAnime/${encodeURIComponent(animeId)}`, {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
         });
 
         if (response.status === 200) {
@@ -59,45 +55,15 @@ async function deleteAnime(event) {
     } catch (err) {
         console.log(err);
     }
-
-    // Update table visibility
-    updateTableVisibility();
 }
 
-function updateTableVisibility() {
-    const table = document.querySelector('table');
-    if (table && table.querySelector('tbody').children.length > 0) {
-        table.style.display = 'block';
-    } else {
-        table.style.display = 'none';
-    }
-}
-
-function attachDeleteListeners() {
-    const deleteButtons = document.querySelectorAll('.fa-trash');
-    deleteButtons.forEach((button) => {
-        button.addEventListener('click', deleteAnime);
-    });
-}
-
-async function handleEditAnime(event) {
-    const row = findParentRow(event.target);
-    if (!row) {
-        console.log('Unable to find parent row');
-        return;
-    }
-
-    const editButton = event.target.closest('.fa-pencil');
-    if (!editButton) {
-        console.log('Unable to find edit button');
-        return;
-    }
-
-    editButton.removeEventListener('click', handleEditAnime); // Remove event listener temporarily
-
-    const animeId = row.id;
-    const animeNameCell = row.cells[0];
-    const descCell = row.cells[1];
+function handleEditAnime(event, id) {
+    event.stopPropagation();
+    const editButton = event.target;
+    const tableRow = editButton.closest('tr');
+    const animeId = tableRow.id;
+    const animeNameCell = tableRow.cells[0];
+    const descCell = tableRow.cells[1];
 
     const currentAnimeName = animeNameCell.textContent;
     const currentDesc = descCell.textContent;
@@ -108,37 +74,43 @@ async function handleEditAnime(event) {
     if (newAnimeName !== null && newDesc !== null) {
         const data = {
             animeName: newAnimeName,
-            desc: newDesc
+            desc: newDesc,
         };
 
-        try {
-            const response = await fetch(`/updateAnime/${encodeURIComponent(animeId)}`, {
+        fetch(`/updateAnime/${encodeURIComponent(animeId)}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+            })
+            .then((response) => {
+                if (response.status === 200) {
+                    animeNameCell.textContent = newAnimeName;
+                    descCell.textContent = newDesc;
+                    console.log('Anime updated successfully');
+                } else {
+                    console.log('Failed to update anime');
+                }
+            })
+            .catch((err) => {
+                console.log(err);
             });
-
-            if (response.status === 200) {
-                animeNameCell.textContent = newAnimeName;
-                descCell.textContent = newDesc;
-                console.log('Anime updated successfully');
-            } else {
-                console.log('Failed to update anime');
-            }
-        } catch (err) {
-            console.log(err);
-        }
     }
-
-    editButton.addEventListener('click', handleEditAnime); // Add event listener back
 }
 
 function findParentRow(element) {
-    while (element) {
-        if (element.tagName === 'TR') {
-            return element;
-        }
-        element = element.parentNode;
+    let parent = element.parentNode;
+    while (parent && parent.tagName !== 'TR') {
+        parent = parent.parentNode;
     }
-    return null;
+    return parent || null;
+}
+
+function updateTableVisibility() {
+    const table = document.querySelector('table');
+    const tbody = table.querySelector('tbody');
+    if (tbody.children.length === 0) {
+        table.style.display = 'none';
+    } else {
+        table.style.display = 'table';
+    }
 }

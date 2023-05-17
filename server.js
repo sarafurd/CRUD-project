@@ -55,14 +55,17 @@ app.post('/addAnime', (request, response) => {
         .catch(error => console.error(error));
 });
 
-app.delete('/deleteAnime/:animeName', (req, res) => {
-    const animeName = req.params.animeName;
-    if (!animeName) {
-        return res.status(400).json({ error: 'Missing animeName parameter' });
+app.delete('/deleteAnime/:animeId', (req, res) => {
+    const animeId = req.params.animeId;
+    if (!animeId) {
+        return res.status(400).json({ error: 'Missing animeId parameter' });
     }
 
+    // Convert the animeId string to an ObjectId
+    const objectId = new ObjectId(animeId);
+
     db.collection('animes')
-        .deleteOne({ animeName: animeName })
+        .deleteOne({ _id: objectId })
         .then(result => {
             console.log('Anime Deleted');
             res.json({ message: 'Anime deleted successfully' });
