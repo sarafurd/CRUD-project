@@ -34,7 +34,11 @@ app.get('/', (request, response) => {
         .sort({ likes: -1 })
         .toArray()
         .then(data => {
-            response.render('index.ejs', { info: data });
+            if (data.length > 0) {
+                response.render('index.ejs', { info: data });
+            } else {
+                response.render('index.ejs', { info: null });
+            }
         })
         .catch(error => console.error(error));
 });
@@ -77,10 +81,6 @@ app.put('/updateAnime/:animeId', (req, res) => {
     const animeId = req.params.animeId;
     const newAnimeName = req.body.animeName;
     const newDesc = req.body.desc;
-
-    console.log('animeId:', animeId);
-    console.log('newAnimeName:', newAnimeName);
-    console.log('newDesc:', newDesc);
 
     // Convert the animeId string to an ObjectId
     const objectId = new ObjectId(animeId);

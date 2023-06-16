@@ -16,6 +16,7 @@
         <h1>Anime Watchlist</h1>
     </div>
     <div id="addanime">
+        <div class="error-message"></div>
         <div class="form-container">
             <h2>Add an Anime:</h2>
             <form action="/addAnime" method="POST">
@@ -26,7 +27,7 @@
         </div>
     </div>
 
-    <% if (info.length > 0) { %>
+    <% if (info !== null) { %>
         <div id="watchlist">
             <table class="anime-table">
                 <thead>
@@ -40,14 +41,14 @@
                 <tbody>
                     <% for (let i = 0; i < info.length; i++) { %>
                         <tr id="<%= info[i]._id %>">
-                            <td>
+                            <td contenteditable="false" class="anime-name">
                                 <%= info[i].animeName %>
                             </td>
-                            <td>
+                            <td contenteditable="false" class="anime-description">
                                 <%= info[i].desc %>
                             </td>
                             <td>
-                                <i class="fas fa-pencil" onclick="handleEditAnime(event, '<%= info[i]._id %>')"></i>
+                                <i class="fas fa-pencil edit-icon" onclick="handleEditAnime(event, '<%= info[i]._id %>')"></i>
                             </td>
                             <td>
                                 <i class="fas fa-trash"></i>
@@ -57,11 +58,8 @@
                 </tbody>
             </table>
         </div>
-        <% } else { %>
-            <p>No anime added yet.</p>
-            <% } %>
-
-                <script src="js/main.js"></script>
+        <% } %>
+            <script src="js/main.js"></script>
 </body>
 
 </html>
