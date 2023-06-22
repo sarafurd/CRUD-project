@@ -35,7 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (deleteButton) {
                 deleteAnime(deleteButton);
             } else if (editButton) {
-                handleEditAnime(editButton);
+                const row = editButton.closest('tr');
+                const animeId = row.id;
+                handleEditAnime(event, row, animeId);
             }
         });
     }
@@ -61,64 +63,6 @@ async function deleteAnime(deleteButton) {
         console.log(err);
     }
 }
-
-// function handleEditAnime(event, id) {
-//     event.stopPropagation();
-//     const editButton = event.target;
-//     const tableRow = editButton.closest('tr');
-//     const animeId = tableRow.id;
-//     const animeNameCell = tableRow.cells[0];
-//     const descCell = tableRow.cells[1];
-
-//     const currentAnimeName = animeNameCell.textContent;
-//     const currentDesc = descCell.textContent;
-
-//     const newAnimeName = prompt('Enter the new anime name:', currentAnimeName);
-//     const newDesc = prompt('Enter the new description:', currentDesc);
-
-//     if (newAnimeName !== null && newDesc !== null) {
-//         const data = {
-//             animeName: newAnimeName,
-//             desc: newDesc,
-//         };
-
-//         fetch(`/updateAnime/${encodeURIComponent(animeId)}`, {
-//                 method: 'PUT',
-//                 headers: { 'Content-Type': 'application/json' },
-//                 body: JSON.stringify(data),
-//             })
-//             .then((response) => {
-//                 if (response.status === 200) {
-//                     animeNameCell.textContent = newAnimeName;
-//                     descCell.textContent = newDesc;
-//                     console.log('Anime updated successfully');
-//                 } else {
-//                     console.log('Failed to update anime');
-//                 }
-//             })
-//             .catch((err) => {
-//                 console.log(err);
-//             });
-//     }
-
-//     // Set cursor position to the end of the input value
-//     setTimeout(() => {
-//         const animeNameInput = document.querySelector('.prompt input');
-//         const descInput = document.querySelectorAll('.prompt input')[1];
-
-//         if (animeNameInput) {
-//             animeNameInput.setAttribute('dir', 'auto');
-//             animeNameInput.focus();
-//             animeNameInput.setSelectionRange(animeNameInput.value.length, animeNameInput.value.length);
-//         }
-
-//         if (descInput) {
-//             descInput.setAttribute('dir', 'auto');
-//             descInput.focus();
-//             descInput.setSelectionRange(descInput.value.length, descInput.value.length);
-//         }
-//     }, 0);
-// }
 
 function handleEditAnime(event, animeId) {
     const row = event.target.closest('tr');
