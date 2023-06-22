@@ -10,7 +10,7 @@ const dbConnectionStr = process.env.DB_STRING;
 const dbName = 'anime';
 
 const connectToDb = async() => {
-    const client = await MongoClient.connect(dbConnectionStr, { useUnifiedTopology: true });
+    const client = await MongoClient.connect(dbConnectionStr, { useUnifiedTopology: true, serverSelectionTimeoutMS: 5000 });
     console.log(`Connected to ${dbName} Database`);
     db = client.db(dbName);
 };
