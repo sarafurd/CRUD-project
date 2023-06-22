@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const MongoClient = require('mongodb').MongoClient;
 const { ObjectId } = require('mongodb');
-const PORT = 8000;
+const PORT = 4000;
 require('dotenv').config();
 
 let db;
@@ -10,7 +10,7 @@ const dbConnectionStr = process.env.DB_STRING;
 const dbName = 'anime';
 
 const connectToDb = async() => {
-    const client = await MongoClient.connect(dbConnectionStr, { useUnifiedTopology: true, serverSelectionTimeoutMS: 5000 });
+    const client = await MongoClient.connect(dbConnectionStr, { useUnifiedTopology: true });
     console.log(`Connected to ${dbName} Database`);
     db = client.db(dbName);
 };
