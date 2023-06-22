@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const MongoClient = require('mongodb').MongoClient;
 const { ObjectId } = require('mongodb');
-const PORT = 4000;
+const PORT = 8000;
 require('dotenv').config();
 
 let db;
